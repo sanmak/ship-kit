@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-15
+
+### Features
+- Auto-add Development Practices footer to project README
+
+### Fixed
+- Support custom path scope and curl pipe in installer
+- Remove unsupported agents field from plugin manifest
+- Add required owner field to marketplace.json
+
 ## [1.0.0] - 2026-03-15
 
 ### Added
