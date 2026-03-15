@@ -3,7 +3,7 @@
 ![CI](https://github.com/sanmak/ship-kit/actions/workflows/ci.yml/badge.svg)
 ![Release](https://github.com/sanmak/ship-kit/actions/workflows/release.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/github/v/release/sanmak/ship-kit)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code-purple.svg)
 ![CodeQL](https://github.com/sanmak/ship-kit/actions/workflows/codeql.yml/badge.svg)
 
