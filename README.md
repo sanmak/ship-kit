@@ -7,7 +7,8 @@
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code-purple.svg)
 ![CodeQL](https://github.com/sanmak/ship-kit/actions/workflows/codeql.yml/badge.svg)
 
-> Git workflow automation — commit, push, ship, release, review, and monitor from Claude Code
+> Autonomous Git workflows for Claude Code.
+> Ship, review, release, and auto-fix CI - 20+ commands, reusable skills, and background agents that operate without context switching.
 
 ## Overview
 
@@ -51,74 +52,74 @@ cd ship-kit
 
 ### Core Workflow
 
-| Command | Description |
-|---------|-------------|
+| Command   | Description                                         |
+| --------- | --------------------------------------------------- |
 | `/commit` | Stage, review, and commit with conventional message |
-| `/push` | Validate and push unpushed commits |
-| `/ship` | Commit and push in one step |
+| `/push`   | Validate and push unpushed commits                  |
+| `/ship`   | Commit and push in one step                         |
 
 ### PR Automation
 
-| Command | Description |
-|---------|-------------|
-| `/ship-pr` | Commit, create PR branch, and open a pull request |
-| `/pr-fix [PR-number]` | Fetch PR review comments and fix them |
+| Command                         | Description                                                      |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `/ship-pr`                      | Commit, create PR branch, and open a pull request                |
+| `/pr-fix [PR-number]`           | Fetch PR review comments and fix them                            |
 | `/pr-review-canvas [PR-number]` | Generate an interactive HTML PR walkthrough with annotated diffs |
 
 ### Release & Versioning
 
-| Command | Description |
-|---------|-------------|
-| `/release [--dry-run]` | Bump version, update CHANGELOG, tag, and publish release |
+| Command                          | Description                                                |
+| -------------------------------- | ---------------------------------------------------------- |
+| `/release [--dry-run]`           | Bump version, update CHANGELOG, tag, and publish release   |
 | `/hotfix [base-tag] [--dry-run]` | Emergency hotfix — branch, fix, validate, tag, cherry-pick |
 
 ### CI & Monitoring
 
-| Command | Description |
-|---------|-------------|
-| `/monitor` | Check CI status and auto-fix failures |
-| `/loop-on-ci` | Watch CI runs and iterate on failures until checks pass |
-| `/run-smoke-tests [test-path]` | Run Playwright smoke tests and triage failures |
+| Command                        | Description                                             |
+| ------------------------------ | ------------------------------------------------------- |
+| `/monitor`                     | Check CI status and auto-fix failures                   |
+| `/loop-on-ci`                  | Watch CI runs and iterate on failures until checks pass |
+| `/run-smoke-tests [test-path]` | Run Playwright smoke tests and triage failures          |
 
 ### Branch Management
 
-| Command | Description |
-|---------|-------------|
+| Command                                    | Description                                                       |
+| ------------------------------------------ | ----------------------------------------------------------------- |
 | `/sync [base-branch] [--merge] [--rebase]` | Sync branch with upstream — fetch, rebase/merge, handle conflicts |
-| `/resolve [--status] [--abort]` | Detect and resolve merge/rebase/cherry-pick conflicts |
-| `/cleanup [--dry-run] [--include-remote]` | Clean up stale branches — delete merged locals, prune remotes |
+| `/resolve [--status] [--abort]`            | Detect and resolve merge/rebase/cherry-pick conflicts             |
+| `/cleanup [--dry-run] [--include-remote]`  | Clean up stale branches — delete merged locals, prune remotes     |
 
 ### Code Review
 
-| Command | Description |
-|---------|-------------|
-| `/review [PR-number] [--post]` | AI-assisted code review with structured findings |
-| `/deslop [file\|path]` | Remove AI-generated code slop and clean up code style |
+| Command                        | Description                                           |
+| ------------------------------ | ----------------------------------------------------- |
+| `/review [PR-number] [--post]` | AI-assisted code review with structured findings      |
+| `/deslop [file\|path]`         | Remove AI-generated code slop and clean up code style |
 
 ### Documentation
 
-| Command | Description |
-|---------|-------------|
-| `/docs-sync` | Sync docs stale relative to changed source files |
+| Command                                                             | Description                                                      |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `/docs-sync`                                                        | Sync docs stale relative to changed source files                 |
 | `/sequence-diagram [file/path \| "description"] [--output file.md]` | Generate Mermaid sequence diagrams from code or natural language |
 
 ### Developer Productivity
 
-| Command | Description |
-|---------|-------------|
-| `/what-did-i-get-done [period]` | Summarize authored commits over a given time period |
-| `/weekly-review` | Generate weekly recap with bugfix/tech-debt/net-new highlights |
+| Command                         | Description                                                    |
+| ------------------------------- | -------------------------------------------------------------- |
+| `/what-did-i-get-done [period]` | Summarize authored commits over a given time period            |
+| `/weekly-review`                | Generate weekly recap with bugfix/tech-debt/net-new highlights |
 
 ## Architecture
 
 ShipKit uses a **four-tier architecture** to keep components focused and composable:
 
-| Tier | Purpose | Example |
-|------|---------|---------|
-| **Command** | Orchestrates a user-facing workflow | `/ship` calls stage-and-commit then validate-and-push |
-| **Skill** | Performs a single, reusable task | `stage-and-commit` stages files and creates a commit |
-| **Agent** | Runs autonomously over time | `ci-watcher` polls CI and fixes failures in a loop |
-| **Rule** | Enforces a coding standard passively | `typescript-exhaustive-switch` flags missing switch cases |
+| Tier        | Purpose                              | Example                                                   |
+| ----------- | ------------------------------------ | --------------------------------------------------------- |
+| **Command** | Orchestrates a user-facing workflow  | `/ship` calls stage-and-commit then validate-and-push     |
+| **Skill**   | Performs a single, reusable task     | `stage-and-commit` stages files and creates a commit      |
+| **Agent**   | Runs autonomously over time          | `ci-watcher` polls CI and fixes failures in a loop        |
+| **Rule**    | Enforces a coding standard passively | `typescript-exhaustive-switch` flags missing switch cases |
 
 **Litmus test** — when adding a new component, ask:
 
@@ -136,13 +137,20 @@ ShipKit reads project-level settings from `.shipkit.json` in your repository roo
 {
   "schemaVersion": 1,
   "commit": {
-    "conventionalPrefixes": ["feat", "fix", "chore", "docs", "test", "refactor"],
-    "coAuthor": "Co-Authored-By: ShipKit <noreply@shipkit.dev>"
+    "conventionalPrefixes": [
+      "feat",
+      "fix",
+      "chore",
+      "docs",
+      "test",
+      "refactor",
+    ],
+    "coAuthor": "Co-Authored-By: ShipKit <noreply@shipkit.dev>",
   },
   "ci": {
     "provider": "github-actions",
-    "maxFixCycles": 3
-  }
+    "maxFixCycles": 3,
+  },
 }
 ```
 
