@@ -1,0 +1,558 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://shipkit.dev/schemas/shipkit.json",
+  "title": "ShipKit Configuration",
+  "description": "Schema for .shipkit.json configuration files used by the ShipKit plugin.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "default": 1,
+      "description": "The schema version of this configuration file. Default: 1"
+    },
+    "build": {
+      "type": "object",
+      "description": "Build configuration for automatic trigger-based builds.",
+      "additionalProperties": false,
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "description": "List of build triggers that watch file patterns and run commands.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["watch", "run", "stage"],
+            "properties": {
+              "watch": {
+                "type": "array",
+                "description": "Glob patterns of files to watch for changes.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "run": {
+                "type": "string",
+                "description": "The command to run when watched files change."
+              },
+              "stage": {
+                "type": "array",
+                "description": "Glob patterns of output files to stage after the build command runs.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation commands to run during pre-commit or CI checks.",
+      "additionalProperties": false,
+      "properties": {
+        "commands": {
+          "type": "array",
+          "description": "List of validation commands.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "run"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Human-readable name for this validation step."
+              },
+              "run": {
+                "type": "string",
+                "description": "The shell command to execute for validation."
+              }
+            }
+          }
+        }
+      }
+    },
+    "sensitive": {
+      "type": "object",
+      "description": "Configuration for detecting sensitive content that should not be committed.",
+      "additionalProperties": false,
+      "properties": {
+        "patterns": {
+          "type": "array",
+          "description": "Regex patterns to match sensitive content in file contents.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "description": "Keywords that indicate sensitive data (e.g., 'password', 'secret').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "files": {
+          "type": "array",
+          "description": "Glob patterns for files that are always considered sensitive (e.g., '.env').",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "description": "Configuration for commit message formatting and attribution.",
+      "additionalProperties": false,
+      "properties": {
+        "conventionalPrefixes": {
+          "type": "array",
+          "description": "Allowed conventional commit prefixes (e.g., 'feat', 'fix', 'chore').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coAuthor": {
+          "type": ["string", "null"],
+          "description": "Co-author line to append to commit messages, or null to disable. Default: null"
+        }
+      }
+    },
+    "checksums": {
+      "type": "object",
+      "description": "Configuration for file checksum tracking to detect unintended changes.",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether checksum tracking is enabled. Default: false"
+        },
+        "file": {
+          "type": "string",
+          "description": "Path to the checksums file. Default: '.checksums'"
+        },
+        "files": {
+          "type": "array",
+          "description": "Glob patterns of files to track checksums for.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "docs": {
+      "type": "object",
+      "description": "Configuration for automatic documentation generation and dependency mapping.",
+      "additionalProperties": false,
+      "properties": {
+        "dependencyMap": {
+          "type": "array",
+          "description": "Mappings from source files to their corresponding documentation files.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sources", "docs"],
+            "properties": {
+              "sources": {
+                "type": "array",
+                "description": "Glob patterns for source files.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "docs": {
+                "type": "array",
+                "description": "Glob patterns for documentation files that depend on the sources.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "autoDetect": {
+          "type": "boolean",
+          "description": "Whether to automatically detect documentation dependencies. Default: false"
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "description": "Configuration for release management, changelogs, and version bumping.",
+      "additionalProperties": false,
+      "properties": {
+        "changelog": {
+          "type": "string",
+          "description": "Path to the changelog file. Default: 'CHANGELOG.md'"
+        },
+        "versionFiles": {
+          "type": "array",
+          "description": "Files that contain version strings to update during a release.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "type"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to the version file."
+              },
+              "type": {
+                "type": "string",
+                "enum": ["json", "toml", "text"],
+                "description": "The format of the version file."
+              },
+              "jsonPath": {
+                "type": "string",
+                "description": "JSON path expression to the version field (only for type 'json')."
+              },
+              "tomlPath": {
+                "type": "string",
+                "description": "TOML path expression to the version field (only for type 'toml')."
+              },
+              "pattern": {
+                "type": "string",
+                "description": "Regex pattern to locate and replace the version string (only for type 'text')."
+              }
+            }
+          }
+        },
+        "preRelease": {
+          "type": "array",
+          "description": "Commands to run before creating a release.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "releaseBranch": {
+          "type": "string",
+          "description": "The branch from which releases are created. Default: 'main'"
+        },
+        "tagPrefix": {
+          "type": "string",
+          "description": "Prefix for release tags. Default: 'v'"
+        }
+      }
+    },
+    "pr": {
+      "type": "object",
+      "description": "Configuration for pull request creation and management.",
+      "additionalProperties": false,
+      "properties": {
+        "template": {
+          "type": "string",
+          "description": "Path to the pull request template file."
+        },
+        "baseBranch": {
+          "type": "string",
+          "description": "Default base branch for pull requests. Default: 'main'"
+        },
+        "branchPrefix": {
+          "type": "string",
+          "description": "Prefix for feature branches created for PRs (e.g., 'feature/')."
+        },
+        "allowExistingUnpushedCommits": {
+          "type": "boolean",
+          "description": "Whether to allow creating a PR when there are existing unpushed commits on the branch. Default: false"
+        }
+      }
+    },
+    "ci": {
+      "type": "object",
+      "description": "Configuration for CI integration and automated failure recovery.",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "The CI provider name (e.g., 'github-actions', 'gitlab-ci', 'circleci')."
+        },
+        "maxFixCycles": {
+          "type": "integer",
+          "description": "Maximum number of automated fix attempts before giving up. Default: 3"
+        },
+        "failureHints": {
+          "type": "array",
+          "description": "Pattern-based hints for automatically resolving CI failures.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["pattern", "fix", "description"],
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Regex pattern to match against CI failure output."
+              },
+              "fix": {
+                "type": "string",
+                "description": "Command or action to run to fix the matched failure."
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable description of what this hint addresses."
+              }
+            }
+          }
+        }
+      }
+    },
+    "resolve": {
+      "type": "object",
+      "description": "Configuration for automatic merge conflict resolution.",
+      "additionalProperties": false,
+      "properties": {
+        "autoMode": {
+          "type": "boolean",
+          "description": "Whether to automatically resolve conflicts without prompting. Default: false"
+        },
+        "resolutionStrategy": {
+          "type": "string",
+          "enum": ["balanced", "ours", "theirs"],
+          "description": "Default strategy for resolving conflicts. 'balanced' attempts intelligent merging. Default: 'balanced'"
+        },
+        "autoSkipLowConfidence": {
+          "type": "boolean",
+          "description": "Whether to skip conflicts where auto-resolution confidence is low. Default: false"
+        },
+        "continueAfterResolve": {
+          "type": "boolean",
+          "description": "Whether to automatically continue the rebase/merge after resolving conflicts. Default: false"
+        },
+        "allowedOperations": {
+          "type": "array",
+          "description": "List of git operations that auto-resolve is allowed for (e.g., 'rebase', 'merge', 'cherry-pick').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ignorePatterns": {
+          "type": "array",
+          "description": "Glob patterns for files to skip during conflict resolution.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "description": "Configuration for automated code review.",
+      "additionalProperties": false,
+      "properties": {
+        "focusAreas": {
+          "type": "array",
+          "description": "Areas to focus on during review (e.g., 'security', 'performance', 'readability').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "severityThreshold": {
+          "type": "string",
+          "enum": ["error", "warning", "suggestion"],
+          "description": "Minimum severity level to report. Default: 'suggestion'"
+        },
+        "ignorePaths": {
+          "type": "array",
+          "description": "Glob patterns for file paths to exclude from review.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maxFileSize": {
+          "type": "integer",
+          "description": "Maximum file size in bytes to include in review. Larger files are skipped. Default: 100000"
+        },
+        "customRules": {
+          "type": "array",
+          "description": "Custom review rules defined by regex patterns.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["pattern", "severity", "message"],
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Regex pattern to match in code."
+              },
+              "severity": {
+                "type": "string",
+                "description": "Severity level for matches (e.g., 'error', 'warning', 'suggestion')."
+              },
+              "message": {
+                "type": "string",
+                "description": "Message to display when the pattern is matched."
+              }
+            }
+          }
+        },
+        "autoPost": {
+          "type": "boolean",
+          "description": "Whether to automatically post review comments to the PR. Default: false"
+        }
+      }
+    },
+    "hotfix": {
+      "type": "object",
+      "description": "Configuration for hotfix branch management and cherry-picking.",
+      "additionalProperties": false,
+      "properties": {
+        "branchPrefix": {
+          "type": "string",
+          "description": "Prefix for hotfix branches. Default: 'hotfix/'"
+        },
+        "targetBranches": {
+          "type": "array",
+          "description": "Branches to cherry-pick the hotfix onto.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skipCherryPick": {
+          "type": "boolean",
+          "description": "Whether to skip automatic cherry-picking to target branches. Default: false"
+        },
+        "requireCleanCherryPick": {
+          "type": "boolean",
+          "description": "Whether to abort if cherry-pick results in conflicts. Default: true"
+        }
+      }
+    },
+    "sync": {
+      "type": "object",
+      "description": "Configuration for branch synchronization with upstream.",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["rebase", "merge"],
+          "description": "Strategy to use when syncing branches. Default: 'rebase'"
+        },
+        "baseBranch": {
+          "type": "string",
+          "description": "The base branch to sync from. Default: 'main'"
+        },
+        "syncUpstream": {
+          "type": "boolean",
+          "description": "Whether to fetch and sync from the upstream remote. Default: false"
+        },
+        "preferUpstream": {
+          "type": "boolean",
+          "description": "Whether to prefer upstream changes over origin when syncing. Default: false"
+        },
+        "runValidationAfterSync": {
+          "type": "boolean",
+          "description": "Whether to run validation commands after syncing. Default: false"
+        },
+        "autoStash": {
+          "type": "boolean",
+          "description": "Whether to automatically stash and restore local changes during sync. Default: true"
+        }
+      }
+    },
+    "cleanup": {
+      "type": "object",
+      "description": "Configuration for branch cleanup and stale branch management.",
+      "additionalProperties": false,
+      "properties": {
+        "protectedBranches": {
+          "type": "array",
+          "description": "Branch names or patterns that should never be deleted.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deleteRemote": {
+          "type": "boolean",
+          "description": "Whether to also delete remote branches during cleanup. Default: false"
+        },
+        "staleDays": {
+          "type": "integer",
+          "description": "Number of days of inactivity before a branch is considered stale. Default: 30"
+        },
+        "autoConfirmLocal": {
+          "type": "boolean",
+          "description": "Whether to skip confirmation when deleting local branches. Default: false"
+        }
+      }
+    },
+    "smokeTests": {
+      "type": "object",
+      "description": "Configuration for smoke test execution after deployments or releases.",
+      "additionalProperties": false,
+      "properties": {
+        "runner": {
+          "type": "string",
+          "description": "The test runner to use (e.g., 'jest', 'vitest', 'pytest')."
+        },
+        "command": {
+          "type": "string",
+          "description": "The shell command to execute smoke tests."
+        },
+        "reportDir": {
+          "type": "string",
+          "description": "Directory to store smoke test reports. Default: '.shipkit/reports'"
+        },
+        "retries": {
+          "type": "integer",
+          "description": "Number of times to retry failed smoke tests. Default: 0"
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "Timeout in seconds for the smoke test run. Default: 300"
+        }
+      }
+    },
+    "codeQuality": {
+      "type": "object",
+      "description": "Configuration for code quality checks and slop detection.",
+      "additionalProperties": false,
+      "properties": {
+        "slopPatterns": {
+          "type": "array",
+          "description": "Regex patterns that indicate low-quality or 'slop' code to flag.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ignoreFiles": {
+          "type": "array",
+          "description": "Glob patterns for files to exclude from code quality checks.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "autoFix": {
+          "type": "boolean",
+          "description": "Whether to automatically apply fixes for detected issues. Default: false"
+        }
+      }
+    },
+    "worktrees": {
+      "type": "object",
+      "description": "Configuration for git worktree management.",
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "type": "string",
+          "description": "Base directory for creating worktrees. Default: '.worktrees'"
+        },
+        "lockDir": {
+          "type": "string",
+          "description": "Directory for worktree lock files. Default: '.worktrees/.locks'"
+        },
+        "maxLockAgeDays": {
+          "type": "integer",
+          "description": "Maximum age in days for a lock file before it is considered stale. Default: 7"
+        },
+        "cleanupOnSuccess": {
+          "type": "boolean",
+          "description": "Whether to automatically remove a worktree after its task completes successfully. Default: true"
+        },
+        "branchPrefix": {
+          "type": "string",
+          "description": "Prefix for branches created within worktrees. Default: 'wt/'"
+        }
+      }
+    }
+  }
+}

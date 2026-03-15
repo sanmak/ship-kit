@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "validation": {
+    "commands": [
+      { "name": "Lint", "run": "npm run lint" },
+      { "name": "Tests", "run": "npm test" }
+    ]
+  },
+  "sensitive": {
+    "patterns": [".env", ".env.*", "*.pem", "*.key"],
+    "keywords": ["PRIVATE KEY"],
+    "files": []
+  },
+  "commit": {
+    "conventionalPrefixes": ["feat", "fix", "chore", "docs", "test", "refactor"],
+    "coAuthor": null
+  },
+  "release": {
+    "changelog": "CHANGELOG.md",
+    "versionFiles": [
+      { "path": "package.json", "type": "json", "jsonPath": "version" }
+    ],
+    "preRelease": ["npm run build", "npm test"],
+    "releaseBranch": "main",
+    "tagPrefix": "v"
+  },
+  "ci": {
+    "provider": "github-actions",
+    "maxFixCycles": 3
+  },
+  "review": {
+    "focusAreas": ["bugs", "security", "performance", "style"],
+    "severityThreshold": "suggestion"
+  }
+}

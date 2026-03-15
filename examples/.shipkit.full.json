@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+
+  "build": {
+    "triggers": [
+      {
+        "watch": ["src/**/*.ts", "src/**/*.tsx"],
+        "run": "npm run build",
+        "stage": ["dist/**/*.js", "dist/**/*.d.ts"]
+      },
+      {
+        "watch": ["styles/**/*.scss"],
+        "run": "npm run build:css",
+        "stage": ["dist/**/*.css"]
+      },
+      {
+        "watch": ["proto/**/*.proto"],
+        "run": "npm run codegen",
+        "stage": ["src/generated/**/*"]
+      }
+    ]
+  },
+
+  "validation": {
+    "commands": [
+      { "name": "Lint", "run": "npm run lint" },
+      { "name": "Type Check", "run": "npm run typecheck" },
+      { "name": "Unit Tests", "run": "npm test -- --coverage" },
+      { "name": "Integration Tests", "run": "npm run test:integration" },
+      { "name": "Format Check", "run": "npx prettier --check ." }
+    ]
+  },
+
+  "sensitive": {
+    "patterns": [
+      "\\.env",
+      "\\.env\\..*",
+      ".*\\.pem",
+      ".*\\.key",
+      ".*\\.p12",
+      ".*\\.pfx",
+      "credentials\\.json"
+    ],
+    "keywords": [
+      "PRIVATE KEY",
+      "API_KEY",
+      "SECRET",
+      "PASSWORD",
+      "ACCESS_TOKEN",
+      "aws_secret_access_key"
+    ],
+    "files": [
+      ".env",
+      ".env.local",
+      ".env.production",
+      "secrets.yaml",
+      "service-account.json"
+    ]
+  },
+
+  "commit": {
+    "conventionalPrefixes": [
+      "feat",
+      "fix",
+      "chore",
+      "docs",
+      "test",
+      "refactor",
+      "style",
+      "perf",
+      "ci",
+      "build",
+      "revert"
+    ],
+    "coAuthor": "ShipKit Bot <bot@shipkit.dev>"
+  },
+
+  "checksums": {
+    "enabled": true,
+    "file": ".checksums",
+    "files": [
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      "schema.prisma",
+      "migrations/**/*.sql"
+    ]
+  },
+
+  "docs": {
+    "dependencyMap": [
+      {
+        "sources": ["src/api/**/*.ts"],
+        "docs": ["docs/api/**/*.md"]
+      },
+      {
+        "sources": ["src/config/**/*.ts"],
+        "docs": ["docs/configuration.md"]
+      },
+      {
+        "sources": ["src/cli/**/*.ts"],
+        "docs": ["docs/cli-reference.md", "README.md"]
+      }
+    ],
+    "autoDetect": true
+  },
+
+  "release": {
+    "changelog": "CHANGELOG.md",
+    "versionFiles": [
+      { "path": "package.json", "type": "json", "jsonPath": "version" },
+      { "path": "package-lock.json", "type": "json", "jsonPath": "version" },
+      { "path": "pyproject.toml", "type": "toml", "tomlPath": "tool.poetry.version" },
+      { "path": "version.txt", "type": "text", "pattern": "^(\\d+\\.\\d+\\.\\d+)$" }
+    ],
+    "preRelease": [
+      "npm run lint",
+      "npm run typecheck",
+      "npm test",
+      "npm run build"
+    ],
+    "releaseBranch": "main",
+    "tagPrefix": "v"
+  },
+
+  "pr": {
+    "template": ".github/PULL_REQUEST_TEMPLATE.md",
+    "baseBranch": "main",
+    "branchPrefix": "feature/",
+    "allowExistingUnpushedCommits": false
+  },
+
+  "ci": {
+    "provider": "github-actions",
+    "maxFixCycles": 5,
+    "failureHints": [
+      {
+        "pattern": "ERR_PNPM_OUTDATED_LOCKFILE",
+        "fix": "pnpm install --no-frozen-lockfile",
+        "description": "Lockfile is out of date with package.json"
+      },
+      {
+        "pattern": "error TS\\d+:",
+        "fix": "npx tsc --noEmit",
+        "description": "TypeScript compilation errors detected"
+      },
+      {
+        "pattern": "ESLint.*found \\d+ problems",
+        "fix": "npm run lint -- --fix",
+        "description": "ESLint violations that may be auto-fixable"
+      },
+      {
+        "pattern": "ENOSPC: no space left on device",
+        "fix": "npm cache clean --force",
+        "description": "Disk space exhausted, clear caches"
+      }
+    ]
+  },
+
+  "resolve": {
+    "autoMode": false,
+    "resolutionStrategy": "balanced",
+    "autoSkipLowConfidence": true,
+    "continueAfterResolve": true,
+    "allowedOperations": ["rebase", "merge", "cherry-pick"],
+    "ignorePatterns": [
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      "*.generated.*"
+    ]
+  },
+
+  "review": {
+    "focusAreas": [
+      "bugs",
+      "security",
+      "performance",
+      "readability",
+      "style",
+      "testing",
+      "error-handling",
+      "concurrency"
+    ],
+    "severityThreshold": "suggestion",
+    "ignorePaths": [
+      "dist/**",
+      "node_modules/**",
+      "coverage/**",
+      "*.min.js",
+      "*.generated.*",
+      "vendor/**"
+    ],
+    "maxFileSize": 150000,
+    "customRules": [
+      {
+        "pattern": "console\\.log\\(",
+        "severity": "warning",
+        "message": "Remove console.log before merging; use a proper logger instead."
+      },
+      {
+        "pattern": "TODO|FIXME|HACK|XXX",
+        "severity": "suggestion",
+        "message": "Outstanding TODO/FIXME comment found — consider resolving before merge."
+      },
+      {
+        "pattern": "any(?:\\s|;|\\))",
+        "severity": "warning",
+        "message": "Avoid using 'any' type; prefer explicit types for better type safety."
+      }
+    ],
+    "autoPost": true
+  },
+
+  "hotfix": {
+    "branchPrefix": "hotfix/",
+    "targetBranches": ["main", "release/stable", "release/v1.x"],
+    "skipCherryPick": false,
+    "requireCleanCherryPick": true
+  },
+
+  "sync": {
+    "strategy": "rebase",
+    "baseBranch": "main",
+    "syncUpstream": true,
+    "preferUpstream": false,
+    "runValidationAfterSync": true,
+    "autoStash": true
+  },
+
+  "cleanup": {
+    "protectedBranches": ["main", "develop", "release/*", "hotfix/*"],
+    "deleteRemote": true,
+    "staleDays": 14,
+    "autoConfirmLocal": false
+  },
+
+  "smokeTests": {
+    "runner": "vitest",
+    "command": "npm run test:smoke",
+    "reportDir": ".shipkit/reports",
+    "retries": 2,
+    "timeout": 600
+  },
+
+  "codeQuality": {
+    "slopPatterns": [
+      "\\bFIXME\\b",
+      "\\bHACK\\b",
+      "\\bXXX\\b",
+      "debugger;",
+      "console\\.debug\\(",
+      "\\.only\\(",
+      "sleep\\(\\d+\\)",
+      "eslint-disable(?!-next-line)"
+    ],
+    "ignoreFiles": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/__fixtures__/**",
+      "**/__mocks__/**",
+      "dist/**",
+      "scripts/**"
+    ],
+    "autoFix": false
+  },
+
+  "worktrees": {
+    "dir": ".worktrees",
+    "lockDir": ".worktrees/.locks",
+    "maxLockAgeDays": 7,
+    "cleanupOnSuccess": true,
+    "branchPrefix": "wt/"
+  }
+}

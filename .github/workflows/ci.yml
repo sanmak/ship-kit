@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate components
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x scripts/validate-components.sh
+
+      - name: Validate all component directories
+        run: ./scripts/validate-components.sh
+
+  schema:
+    name: Validate schema.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate schema.json is valid JSON
+        run: python3 -c "import json; json.load(open('schema.json'))"
+
+  examples:
+    name: Validate example configs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate all example JSON files
+        run: |
+          shopt -s nullglob
+          files=(examples/*.json)
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "No example JSON files found, skipping."
+            exit 0
+          fi
+          for f in "${files[@]}"; do
+            echo "Validating $f ..."
+            python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$f"
+          done
+          echo "All example configs are valid JSON."
+
+  manifests:
+    name: Validate manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate plugin.json
+        run: python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))"
+
+      - name: Validate marketplace.json
+        run: python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"
+
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run shellcheck on install.sh
+        run: shellcheck install.sh

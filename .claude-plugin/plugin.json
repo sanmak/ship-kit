@@ -1,0 +1,26 @@
+{
+  "name": "ship-kit",
+  "version": "1.0.0",
+  "description": "Git workflow automation — commit, push, ship, release, review, and monitor from Claude Code",
+  "author": {
+    "name": "Sanket Makhija"
+  },
+  "repository": "https://github.com/sanmak/ship-kit",
+  "homepage": "https://github.com/sanmak/ship-kit",
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "workflow",
+    "commit",
+    "push",
+    "release",
+    "pr",
+    "ci",
+    "automation",
+    "review",
+    "productivity"
+  ],
+  "commands": "./commands/",
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

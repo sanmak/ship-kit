@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "validation": {
+    "commands": [
+      { "name": "Validate Components", "run": "bash scripts/validate-components.sh" },
+      { "name": "Validate Schema", "run": "python3 -c \"import json; json.load(open('schema.json'))\"" },
+      { "name": "Shellcheck", "run": "shellcheck install.sh || true" }
+    ]
+  },
+  "sensitive": {
+    "patterns": [".env", ".env.*", "*.pem", "*.key"],
+    "keywords": ["PRIVATE KEY", "sk-", "ghp_"],
+    "files": []
+  },
+  "commit": {
+    "conventionalPrefixes": ["feat", "fix", "chore", "docs", "test", "refactor"],
+    "coAuthor": null
+  },
+  "release": {
+    "changelog": "CHANGELOG.md",
+    "versionFiles": [
+      { "path": ".claude-plugin/plugin.json", "type": "json", "jsonPath": "version" }
+    ],
+    "preRelease": [
+      "bash scripts/validate-components.sh",
+      "python3 -c \"import json; json.load(open('schema.json'))\""
+    ],
+    "releaseBranch": "main",
+    "tagPrefix": "v"
+  },
+  "ci": {
+    "provider": "github-actions",
+    "maxFixCycles": 3
+  },
+  "review": {
+    "focusAreas": ["bugs", "security"],
+    "severityThreshold": "warning",
+    "ignorePaths": ["*.lock", "examples/**"]
+  },
+  "cleanup": {
+    "protectedBranches": ["main", "master", "develop"],
+    "deleteRemote": false,
+    "staleDays": 30
+  }
+}

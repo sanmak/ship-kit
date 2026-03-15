@@ -1,0 +1,11 @@
+{
+  "name": "ship-kit-marketplace",
+  "description": "ShipKit plugin marketplace",
+  "plugins": [
+    {
+      "name": "ship-kit",
+      "description": "Git workflow automation — commit, push, ship, release, review, and monitor from Claude Code",
+      "source": "./"
+    }
+  ]
+}

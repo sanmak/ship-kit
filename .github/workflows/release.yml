@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Detected version: ${VERSION}"
+
+      - name: Validate version matches plugin.json
+        run: |
+          PLUGIN_VERSION="$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
+          if [[ "$PLUGIN_VERSION" != "${{ steps.version.outputs.version }}" ]]; then
+            echo "::error::Tag version (${{ steps.version.outputs.version }}) does not match plugin.json version (${PLUGIN_VERSION})"
+            exit 1
+          fi
+          echo "Version matches plugin.json: ${PLUGIN_VERSION}"
+
+      - name: Extract CHANGELOG notes
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          NOTES=""
+
+          if [[ -f CHANGELOG.md ]]; then
+            # Extract the section for this version.
+            # Looks for a heading like "## [1.0.0]" or "## 1.0.0" and captures
+            # everything until the next ## heading or end of file.
+            NOTES="$(awk -v ver="$VERSION" '
+              BEGIN { found=0 }
+              /^## / {
+                if (found) exit
+                if (index($0, ver)) { found=1; next }
+              }
+              found { print }
+            ' CHANGELOG.md)"
+          fi
+
+          if [[ -z "$NOTES" ]]; then
+            NOTES="Release ${VERSION}"
+          fi
+
+          # Write multiline output safely
+          {
+            echo "notes<<NOTES_EOF"
+            echo "$NOTES"
+            echo "NOTES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+
+          # Check if release already exists
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release ${TAG} already exists, skipping creation."
+            exit 0
+          fi
+
+          # Create the release
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "${{ steps.changelog.outputs.notes }}" \
+            --verify-tag
