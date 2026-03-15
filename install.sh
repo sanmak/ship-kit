@@ -114,6 +114,30 @@ copy_components() {
 }
 
 # ---------------------------------------------------------------------------
+# Helper: append Development Practices footer to target project README
+# ---------------------------------------------------------------------------
+add_readme_footer() {
+  local project_root="${TARGET_DIR%/.claude/commands}"
+  local readme="${project_root}/README.md"
+
+  if [[ -f "$readme" ]]; then
+    if grep -q 'ship-kit' "$readme"; then
+      echo "  [skip] README: ShipKit footer already present"
+    else
+      cat >> "$readme" <<'FOOTER'
+
+---
+
+### Development Practices
+
+This project uses [ShipKit](https://github.com/sanmak/ship-kit) for git workflow automation — commit, push, ship, release, review, and monitor from Claude Code.
+FOOTER
+      echo "  [ok]   README: added ShipKit development practices footer"
+    fi
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Install
 # ---------------------------------------------------------------------------
 echo "ShipKit Installer"
@@ -128,6 +152,7 @@ mkdir -p "${TARGET_DIR}"
 copy_components "commands" "Commands"
 copy_components "skills"   "Skills"
 copy_components "agents"   "Agents"
+add_readme_footer
 
 echo ""
 echo "Installation complete."
