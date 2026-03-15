@@ -34,7 +34,7 @@ Follow the **stage-and-commit** skill procedure:
 3. **Check build triggers** — if `build.triggers` are configured and staged files match `watch` patterns, run the trigger's `run` command and stage `stage` output files. Abort if any trigger command fails.
 4. **Regenerate checksums** — if `checksums.enabled`, compute SHA-256 for configured files and update the checksums file.
 5. **Review the diff** — display `git diff --cached --stat` and analyze the changes.
-6. **Generate a conventional commit message** — use the format `<type>(<scope>): <description>` with types from `commit.conventionalPrefixes` (default: feat, fix, chore, docs, test, refactor). Append `commit.coAuthor` trailer if configured.
+6. **Generate a conventional commit message** — use the format `<type>(<scope>): <description>` with types from `commit.conventionalPrefixes` (default: feat, fix, chore, docs, test, refactor). **Do NOT add any Co-Authored-By trailer unless `commit.coAuthor` is explicitly set to a non-null string** — append only that exact value if configured.
 7. **Commit** — run `git commit -m "<message>"`. Never use `--no-verify`.
 
 ### 3. Report

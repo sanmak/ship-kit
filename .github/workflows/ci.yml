@@ -14,7 +14,7 @@ jobs:
     name: Validate components
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Make scripts executable
         run: chmod +x scripts/validate-components.sh
@@ -26,7 +26,7 @@ jobs:
     name: Validate schema.json
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate schema.json is valid JSON
         run: python3 -c "import json; json.load(open('schema.json'))"
@@ -35,7 +35,7 @@ jobs:
     name: Validate example configs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate all example JSON files
         run: |
@@ -55,7 +55,7 @@ jobs:
     name: Validate manifests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate plugin.json
         run: python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))"
@@ -67,7 +67,7 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run shellcheck on install.sh
         run: shellcheck install.sh
