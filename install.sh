@@ -5,20 +5,22 @@ set -euo pipefail
 # Installs ShipKit components as a Claude Code plugin.
 #
 # Usage:
-#   ./install.sh [--scope user|project]
+#   ./install.sh [--scope user|project|<path>]
 #
 # Scope:
 #   user    -> installs to ~/.claude/commands/
 #   project -> installs to .claude/commands/ (default)
+#   <path>  -> installs to <path>/.claude/commands/
 
 SCOPE="project"
 
 usage() {
-  echo "Usage: $0 [--scope user|project]"
+  echo "Usage: $0 [--scope user|project|<path>]"
   echo ""
   echo "Options:"
   echo "  --scope user     Install to ~/.claude/commands/ (user-wide)"
   echo "  --scope project  Install to .claude/commands/  (default)"
+  echo "  --scope <path>   Install to <path>/.claude/commands/"
   exit 1
 }
 
@@ -33,10 +35,6 @@ while [[ $# -gt 0 ]]; do
         usage
       fi
       SCOPE="$2"
-      if [[ "$SCOPE" != "user" && "$SCOPE" != "project" ]]; then
-        echo "Error: scope must be 'user' or 'project', got '${SCOPE}'" >&2
-        usage
-      fi
       shift 2
       ;;
     -h|--help)
@@ -54,14 +52,40 @@ done
 # ---------------------------------------------------------------------------
 if [[ "$SCOPE" == "user" ]]; then
   TARGET_DIR="${HOME}/.claude/commands"
-else
+elif [[ "$SCOPE" == "project" ]]; then
   TARGET_DIR=".claude/commands"
+else
+  # Custom path — resolve to absolute and append .claude/commands
+  if [[ ! -d "$SCOPE" ]]; then
+    echo "Error: directory '${SCOPE}' does not exist" >&2
+    exit 1
+  fi
+  TARGET_DIR="$(cd "$SCOPE" && pwd)/.claude/commands"
 fi
 
 # ---------------------------------------------------------------------------
 # Resolve source directory (where this script lives)
 # ---------------------------------------------------------------------------
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_URL="https://github.com/sanmak/ship-kit"
+CLEANUP_TEMP=""
+
+if [[ -n "${BASH_SOURCE[0]:-}" && "${BASH_SOURCE[0]}" != "" ]]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+  # Running via curl | bash — clone the repo to a temp directory
+  TMPDIR_INSTALL="$(mktemp -d)"
+  CLEANUP_TEMP="$TMPDIR_INSTALL"
+  echo "Downloading ShipKit from ${REPO_URL}..."
+  git clone --depth 1 --quiet "$REPO_URL" "$TMPDIR_INSTALL"
+  SCRIPT_DIR="$TMPDIR_INSTALL"
+fi
+
+cleanup() {
+  if [[ -n "$CLEANUP_TEMP" && -d "$CLEANUP_TEMP" ]]; then
+    rm -rf "$CLEANUP_TEMP"
+  fi
+}
+trap cleanup EXIT
 
 # ---------------------------------------------------------------------------
 # Helper: copy a component directory
