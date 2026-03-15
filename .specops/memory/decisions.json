@@ -1,4 +1,45 @@
 {
   "version": 1,
-  "decisions": []
+  "decisions": [
+    {
+      "specId": "shipkit-v1",
+      "specType": "feature",
+      "number": 1,
+      "decision": "Used background agents for parallel task creation",
+      "rationale": "Independent tasks (schema, rules, docs) can run concurrently to speed implementation",
+      "task": "Task 2-4",
+      "date": "2026-03-15",
+      "completedAt": "2026-03-15T08:06:03Z"
+    },
+    {
+      "specId": "shipkit-v1",
+      "specType": "feature",
+      "number": 2,
+      "decision": "Created phase-level GitHub issues instead of per-task",
+      "rationale": "39 individual issues would be noisy; 5 phase milestones provide better tracking granularity",
+      "task": "Task 1",
+      "date": "2026-03-15",
+      "completedAt": "2026-03-15T08:06:03Z"
+    },
+    {
+      "specId": "shipkit-v1",
+      "specType": "feature",
+      "number": 3,
+      "decision": "Deferred manage-worktrees skill to v2",
+      "rationale": "Per plan spec — worktree management is a v2 feature",
+      "task": "Task 29",
+      "date": "2026-03-15",
+      "completedAt": "2026-03-15T08:06:03Z"
+    },
+    {
+      "specId": "shipkit-v1",
+      "specType": "feature",
+      "number": 4,
+      "decision": "Deferred CODE_OF_CONDUCT.md",
+      "rationale": "User requested skip",
+      "task": "Task 3",
+      "date": "2026-03-15",
+      "completedAt": "2026-03-15T08:06:03Z"
+    }
+  ]
 }
