@@ -1,11 +1,19 @@
 {
   "name": "ship-kit-marketplace",
   "description": "ShipKit plugin marketplace",
+  "owner": {
+    "name": "Sanket Makhija",
+    "github": "sanmak"
+  },
   "plugins": [
     {
       "name": "ship-kit",
       "description": "Git workflow automation — commit, push, ship, release, review, and monitor from Claude Code",
-      "source": "./"
+      "source": "./",
+      "owner": {
+        "name": "Sanket Makhija",
+        "github": "sanmak"
+      }
     }
   ]
 }
